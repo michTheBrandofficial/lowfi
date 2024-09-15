@@ -6,13 +6,14 @@
   import { formatVideoDuration } from "@/src/utils";
   import AlbumCover from "@/static/Offset-Set-It-Off-.webp";
   import Song from "@/static/songs/Aoyagi_Ryoko.mp3";
+  import { onMount } from "svelte";
   import Like from "~/icons/Like.svelte";
   import Play from "~/icons/Play.svelte";
   import Position from "~/icons/Position.svelte";
   import Repeat from "~/icons/Repeat.svelte";
   import Shuffle from "~/icons/Shuffle.svelte";
-  import Volume from "~/icons/Volume.svelte";
   import ProgressBar from "./ProgressBar.svelte";
+  import Volume from "./Volume.svelte";
 
   let audioEl: HTMLAudioElement = new Audio(Song);
   let musicStore = {
@@ -21,10 +22,8 @@
     progress: 0,
     isPaused: true,
   };
-  let intervalId = 0;
   function togglePlayPause() {
     if (!audioEl.paused) {
-      clearInterval(intervalId);
       audioEl.pause();
       musicStore = {
         ...musicStore,
@@ -32,51 +31,69 @@
       };
       return;
     }
-    audioEl.volume = 0;
     audioEl.play();
-    const { duration } = {
-      ...audioEl,
-      duration: Math.floor(audioEl.duration),
-    };
     musicStore = {
       ...musicStore,
       isPaused: false,
-      duration: formatVideoDuration(duration),
     };
-    intervalId = setInterval(() => {
+  }
+  function handleSpaceKeyPress({ key }: { key: string }) {
+    if (key === " ") togglePlayPause();
+  }
+  onMount(() => {
+    setTimeout(() => {
+      const { duration } = {
+        ...audioEl,
+        duration: Math.floor(audioEl.duration),
+      };
+      musicStore = {
+        ...musicStore,
+        duration: formatVideoDuration(duration),
+      };
+    }, 1000);
+    audioEl.addEventListener("timeupdate", () => {
       const { currentTime, duration } = audioEl;
-      if (currentTime >= duration) {
-        clearInterval(intervalId);
-        console.log("Done playing video");
-        audioEl.pause();
+      musicStore = {
+        ...musicStore,
+        progress: Math.floor((currentTime / duration) * 100),
+        currentTime: formatVideoDuration(currentTime),
+      };
+    });
+    audioEl.addEventListener("ended", () => {
+      audioEl.pause();
+      musicStore = {
+        ...musicStore,
+        isPaused: true,
+        progress: 100,
+        currentTime: formatVideoDuration(0),
+      };
+    });
+    audioEl.addEventListener("pause", () => {
+      if (!musicStore.isPaused)
         musicStore = {
           ...musicStore,
           isPaused: true,
-          progress: 100,
-          currentTime: formatVideoDuration(currentTime),
         };
-      } else
-        musicStore = {
-          ...musicStore,
-          progress: Math.floor((currentTime / duration) * 100),
-          currentTime: formatVideoDuration(currentTime),
-        };
-    }, 400);
-  }
+    });
+    audioEl.addEventListener("play", () => {
+      musicStore = {
+        ...musicStore,
+        isPaused: false,
+      };
+    });
+  });
 </script>
 
 <section
   class="flex-grow min-h-16 max-h-16 bg-tertiary flex px-4 items-center gap-2 rounded-lg font-Satoshi"
-  on:keyup={({key}) => {
-    if (key === ' ') togglePlayPause();
-  }}
   tabindex={0}
   role="button"
+  on:keydown={handleSpaceKeyPress}
 >
   <div class="flex items-center gap-2">
-    <button on:click={togglePlayPause} on:keyup|stopPropagation={({key}) => {
-      if (key === ' ') togglePlayPause();
-    }}>
+    <button
+      on:click={togglePlayPause}
+    >
       {#if musicStore.isPaused}
         <Pause />
       {:else}
@@ -88,13 +105,18 @@
     <Shuffle />
     <Repeat />
   </div>
-  <div class="flex items-center gap-2">
+  <div class="flex items-center gap-2 pr-2">
     <div class="flex items-center gap-2 text-base text-secondary font-semibold">
       <p class="w-14 text-center">{musicStore.currentTime}</p>
-      <ProgressBar progress={musicStore.progress} />
+      <ProgressBar
+        progress={musicStore.progress}
+        onClick={(progress) => {
+          audioEl.currentTime = (progress / 100) * audioEl.duration;
+        }}
+      />
       <p class="w-14 text-center">{musicStore.duration}</p>
     </div>
-    <Volume />
+    <Volume {audioEl} />
   </div>
   <div class="flex-grow flex items-center gap-3">
     <div>
