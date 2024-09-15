@@ -1,0 +1,26 @@
+<svg
+  width="41"
+  height="41"
+  viewBox="0 0 41 41"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <circle
+    cx="12.3757"
+    cy="20.2056"
+    r="1.68378"
+    fill="#898989"
+  />
+  <circle
+    cx="20.7946"
+    cy="20.2056"
+    r="1.68378"
+    fill="#898989"
+  />
+  <circle
+    cx="29.2134"
+    cy="20.2056"
+    r="1.68378"
+    fill="#898989"
+  />
+</svg>

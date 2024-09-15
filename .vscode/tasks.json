@@ -1,0 +1,19 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "npm",
+			"script": "tauri:dev",
+			"problemMatcher": [],
+			"label": "pnpm: tauri:dev",
+			"detail": "tauri dev"
+		},
+		{
+			"type": "npm",
+			"script": "dev",
+			"problemMatcher": [],
+			"label": "pnpm: dev",
+			"detail": "vite dev"
+		}
+	]
+}
