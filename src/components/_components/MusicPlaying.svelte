@@ -21,11 +21,13 @@
     duration: `00:00`,
     progress: 0,
     isPaused: true,
+    isOnRepeat: false,
   };
+
   function togglePlayPause() {
     if (!audioEl.paused) {
       let currentVolume = audioEl.volume;
-      audioEl.pause()
+      audioEl.pause();
       musicStore = {
         ...musicStore,
         isPaused: true,
@@ -38,7 +40,11 @@
       isPaused: false,
     };
   }
+  function toggleRepeat() {
+    musicStore.isOnRepeat = !musicStore.isOnRepeat;
+  }
   function handleSpaceKeyPress({ key }: { key: string }) {
+    Object.is(key, " ");
     if (key === " ") togglePlayPause();
   }
   onMount(() => {
@@ -52,23 +58,6 @@
         duration: formatVideoDuration(duration),
       };
     }, 1000);
-    audioEl.addEventListener("timeupdate", () => {
-      const { currentTime, duration } = audioEl;
-      musicStore = {
-        ...musicStore,
-        progress: Math.floor((currentTime / duration) * 100),
-        currentTime: formatVideoDuration(currentTime),
-      };
-    });
-    audioEl.addEventListener("ended", () => {
-      audioEl.pause();
-      musicStore = {
-        ...musicStore,
-        isPaused: true,
-        progress: 100,
-        currentTime: formatVideoDuration(0),
-      };
-    });
     audioEl.addEventListener("pause", () => {
       musicStore = {
         ...musicStore,
@@ -80,6 +69,26 @@
         ...musicStore,
         isPaused: false,
       };
+    });
+    audioEl.addEventListener("timeupdate", () => {
+      const { currentTime, duration } = audioEl;
+      musicStore = {
+        ...musicStore,
+        progress: Math.floor((currentTime / duration) * 100),
+        currentTime: formatVideoDuration(currentTime),
+      };
+    });
+    audioEl.addEventListener("ended", () => {
+      if (musicStore.isOnRepeat) audioEl.play();
+      else {
+        audioEl.pause();
+        musicStore = {
+          ...musicStore,
+          isPaused: true,
+          progress: 100,
+          currentTime: formatVideoDuration(0),
+        };
+      }
     });
   });
 </script>
@@ -101,7 +110,9 @@
     <Position position="backward" />
     <Position />
     <Shuffle />
-    <Repeat />
+    <button on:click={toggleRepeat} >
+      <Repeat color={musicStore.isOnRepeat ? "#1ED760" : "#898989"} />
+    </button>
   </div>
   <div class="flex items-center gap-2 pr-2">
     <div class="flex items-center gap-2 text-sm text-secondary font-semibold">
