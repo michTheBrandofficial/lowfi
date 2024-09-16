@@ -24,7 +24,8 @@
   };
   function togglePlayPause() {
     if (!audioEl.paused) {
-      audioEl.pause();
+      let currentVolume = audioEl.volume;
+      audioEl.pause()
       musicStore = {
         ...musicStore,
         isPaused: true,
@@ -69,11 +70,10 @@
       };
     });
     audioEl.addEventListener("pause", () => {
-      if (!musicStore.isPaused)
-        musicStore = {
-          ...musicStore,
-          isPaused: true,
-        };
+      musicStore = {
+        ...musicStore,
+        isPaused: true,
+      };
     });
     audioEl.addEventListener("play", () => {
       musicStore = {
@@ -88,12 +88,10 @@
   class="flex-grow min-h-16 max-h-16 bg-tertiary flex px-4 items-center gap-2 rounded-lg font-Satoshi"
   tabindex={0}
   role="button"
-  on:keydown={handleSpaceKeyPress}
+  on:keyup={handleSpaceKeyPress}
 >
   <div class="flex items-center gap-2">
-    <button
-      on:click={togglePlayPause}
-    >
+    <button on:click={togglePlayPause}>
       {#if musicStore.isPaused}
         <Pause />
       {:else}
@@ -106,7 +104,7 @@
     <Repeat />
   </div>
   <div class="flex items-center gap-2 pr-2">
-    <div class="flex items-center gap-2 text-base text-secondary font-semibold">
+    <div class="flex items-center gap-2 text-sm text-secondary font-semibold">
       <p class="w-14 text-center">{musicStore.currentTime}</p>
       <ProgressBar
         progress={musicStore.progress}

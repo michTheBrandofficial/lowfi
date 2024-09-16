@@ -1,7 +1,5 @@
 <script lang="ts">
   import Volume from "@/src/icons/Volume.svelte";
-  import { cubicOut } from "svelte/easing";
-  import { slide } from "svelte/transition";
   import ProgressBar from "./ProgressBar.svelte";
   let isVolumeProgressShown = false;
   export let audioEl: HTMLAudioElement;
@@ -12,19 +10,12 @@
     <Volume />
   </button>
   {#if isVolumeProgressShown}
-    <div
-      in:slide={{
-        axis: "x",
-        easing: cubicOut
+    <ProgressBar
+      width={84}
+      progress={Math.floor(audioEl.volume * 100)}
+      onClick={(progress) => {
+        audioEl.volume = +(progress / 100).toFixed(1);
       }}
-    >
-      <ProgressBar
-        width={84}
-        progress={50}
-        onClick={(progress) => {
-          audioEl.volume = +(progress / 100).toFixed(1);
-        }}
-      />
-    </div>
+    />
   {/if}
 </div>

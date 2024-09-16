@@ -1,5 +1,7 @@
 <script lang="ts" >
   import { noop, percentage, px } from "@/src/utils";
+  import { cubicOut } from "svelte/easing";
+  import { slide } from "svelte/transition";
 
   export let progress: number;
   export let width: number = 320;
@@ -7,10 +9,17 @@
 </script>
 
 <!-- the noop function is used to prevent the default behavior of the button when the Space key is pressed. -->
-<button 
-  type="button"
+<button
+  in:slide={{
+    axis: 'x',
+    easing: cubicOut
+  }}
+  out:slide={{
+    axis: 'x',
+    easing: cubicOut
+  }}
   style="max-width: 320px; width: {px(width)};" 
-  class="h-[5px] bg-white/60 rounded-full group"
+  class="h-[5px] bg-white/60 rounded-full group relative"
   on:click={(ev) => {
     ev.preventDefault();
     const { currentTarget, offsetX } = ev;
@@ -24,6 +33,6 @@
 >
   <div
     style="width: {percentage(progress)};"
-    class="h-full bg-white rounded-full hover:bg-secondary progress-bar hover:after:block group-hover:after:block group-hover:bg-secondary"
+    class="h-full bg-white rounded-full hover:bg-secondary progress-bar hover:after:block group-hover:after:block group-hover:bg-secondary transition-[width] duration-300"
   />
 </button>

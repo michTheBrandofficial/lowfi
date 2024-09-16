@@ -25,6 +25,10 @@
   display: none;
 }
 
+button {
+  @apply focus:outline-none
+}
+
 @keyframes fade {
   from {
     opacity: 1;
