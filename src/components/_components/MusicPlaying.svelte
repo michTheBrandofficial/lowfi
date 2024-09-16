@@ -44,8 +44,8 @@
     musicStore.isOnRepeat = !musicStore.isOnRepeat;
   }
   function handleSpaceKeyPress({ key }: { key: string }) {
-    Object.is(key, " ");
-    if (key === " ") togglePlayPause();
+    // checks if the key is a spacebar
+    Object.is(key, " ") && togglePlayPause();
   }
   onMount(() => {
     setTimeout(() => {
